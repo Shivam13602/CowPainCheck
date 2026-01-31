@@ -46,6 +46,17 @@ from typing import Dict, List, Optional
 warnings.filterwarnings('ignore')
 
 # ============================================================================
+# RESUME SETTINGS (Colab disconnect-safe)
+# ============================================================================
+# Best practice for Colab: avoid interactive input() so runs can be restarted
+# and continue automatically after disconnect.
+#
+# You can override START_FOLD via environment variable START_FOLD="3"
+# ============================================================================
+AUTO_RESUME = True
+START_FOLD = int(os.environ.get("START_FOLD", "0"))
+
+# ============================================================================
 # SETUP: Mount Drive and Verify Paths
 # ============================================================================
 print("="*80)
@@ -696,17 +707,48 @@ print("✅ Training functions defined (v2.5 - Dual Classification Metrics)")
 print("\n[6] Defining checkpoint manager...")
 
 def find_latest_checkpoint(checkpoint_dir, fold_idx):
-    checkpoints = sorted(checkpoint_dir.glob(f'checkpoint_fold_{fold_idx}_epoch_*.pt'))
-    if checkpoints:
-        return checkpoints[-1]
-    return None
+    # Robust: choose highest epoch number, not lexicographic filename order
+    candidates = []
+    for p in checkpoint_dir.glob(f'checkpoint_fold_{fold_idx}_epoch_*.pt'):
+        name = p.name
+        try:
+            epoch_str = name.split("_epoch_")[-1].replace(".pt", "")
+            epoch = int(epoch_str)
+            candidates.append((epoch, p))
+        except Exception:
+            continue
+    if not candidates:
+        return None
+    candidates.sort(key=lambda x: x[0])
+    return candidates[-1][1]
 
 def save_checkpoint(model, optimizer, scheduler, epoch, fold_idx, val_loss,
-                    checkpoint_dir, is_best=False):
+                    checkpoint_dir, is_best=False, scaler=None,
+                    best_task1_f1=None, best_task2_f1=None, patience_counter=None,
+                    config=None):
     checkpoint = {
         'epoch': epoch, 'fold': fold_idx, 'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict(), 'val_loss': val_loss,
+    }
+    # Save AMP scaler for exact resume
+    if scaler is not None:
+        checkpoint['scaler_state_dict'] = scaler.state_dict()
+    # Save early-stopping state
+    if best_task1_f1 is not None:
+        checkpoint['best_task1_f1'] = float(best_task1_f1)
+    if best_task2_f1 is not None:
+        checkpoint['best_task2_f1'] = float(best_task2_f1)
+    if patience_counter is not None:
+        checkpoint['patience_counter'] = int(patience_counter)
+    if config is not None:
+        checkpoint['config'] = dict(config)
+    # Save RNG states (helps reproducibility when resuming)
+    checkpoint['rng_state'] = {
+        'python': random.getstate(),
+        'numpy': np.random.get_state(),
+        'torch': torch.get_rng_state(),
+        'torch_cuda': torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
     }
 
     checkpoint_path = checkpoint_dir / f'checkpoint_fold_{fold_idx}_epoch_{epoch}.pt'
@@ -796,8 +838,8 @@ print("STARTING v2.5 TRAINING (DUAL CLASSIFICATION): 9 FOLDS")
 print(f"Checkpoints will be saved to: {checkpoint_dir}")
 print("="*80)
 
-resume_fold = input("Start from fold (0-8) or press Enter to start from 0: ").strip()
-start_fold = int(resume_fold) if resume_fold else 0
+start_fold = START_FOLD
+print(f"✅ Start fold: {start_fold} (set START_FOLD env var to override)")
 
 cv_folds = splits.get('cv_folds', [])
 if not cv_folds:
@@ -819,7 +861,8 @@ for fold_idx, fold_data in enumerate(cv_folds[start_fold:], start=start_fold):
     resume = False
     if latest_checkpoint:
         print(f"\n⚠️  Found checkpoint: {latest_checkpoint.name}")
-        resume = input("Resume from checkpoint? (y/n): ").lower() == 'y'
+        resume = AUTO_RESUME
+        print(f"   AUTO_RESUME={AUTO_RESUME} → resume={resume}")
 
     train_sequences = [s for s in all_sequences if s.get('animal', s.get('animal_id')) in train_animals]
     val_sequences = [s for s in all_sequences if s.get('animal', s.get('animal_id')) in val_animals]
@@ -924,6 +967,22 @@ for fold_idx, fold_data in enumerate(cv_folds[start_fold:], start=start_fold):
         scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
         start_epoch = checkpoint['epoch'] + 1
         best_val_loss = checkpoint.get('val_loss', float('inf'))
+        best_task1_f1 = checkpoint.get('best_task1_f1', best_task1_f1)
+        best_task2_f1 = checkpoint.get('best_task2_f1', best_task2_f1)
+        patience_counter = checkpoint.get('patience_counter', patience_counter)
+        if scaler is not None and 'scaler_state_dict' in checkpoint:
+            scaler.load_state_dict(checkpoint['scaler_state_dict'])
+        # Restore RNG states if present
+        rng = checkpoint.get('rng_state')
+        if rng is not None:
+            try:
+                random.setstate(rng.get('python'))
+                np.random.set_state(rng.get('numpy'))
+                torch.set_rng_state(rng.get('torch'))
+                if torch.cuda.is_available() and rng.get('torch_cuda') is not None:
+                    torch.cuda.set_rng_state_all(rng.get('torch_cuda'))
+            except Exception:
+                pass
         print(f"✅ Resumed from epoch {start_epoch}")
 
     # Training loop
@@ -964,12 +1023,17 @@ for fold_idx, fold_data in enumerate(cv_folds[start_fold:], start=start_fold):
             best_task2_f1 = task2_f1
             patience_counter = 0
             save_checkpoint(model, optimizer, scheduler, epoch, fold_idx, val_loss,
-                            checkpoint_dir, is_best=True)
+                            checkpoint_dir, is_best=True, scaler=scaler,
+                            best_task1_f1=best_task1_f1, best_task2_f1=best_task2_f1,
+                            patience_counter=patience_counter, config=config)
         else:
             patience_counter += 1
             print(f"   ⏳ Patience: {patience_counter}/{config['patience']} (Combined F1 improvement: {improvement:.4f})")
 
-        save_checkpoint(model, optimizer, scheduler, epoch, fold_idx, val_loss, checkpoint_dir, is_best=False)
+        save_checkpoint(model, optimizer, scheduler, epoch, fold_idx, val_loss,
+                        checkpoint_dir, is_best=False, scaler=scaler,
+                        best_task1_f1=best_task1_f1, best_task2_f1=best_task2_f1,
+                        patience_counter=patience_counter, config=config)
 
         if epoch >= min_epochs and patience_counter >= config['patience']:
             print(f"   🛑 Early stopping triggered! (trained for {epoch+1} epochs)")
