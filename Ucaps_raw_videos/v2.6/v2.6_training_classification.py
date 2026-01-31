@@ -49,6 +49,14 @@ from PIL import Image
 
 warnings.filterwarnings("ignore")
 
+# ----------------------------
+# Resume controls (Colab-safe)
+# ----------------------------
+# AUTO_RESUME=True means: if a checkpoint exists for a fold, resume automatically
+# START_FOLD allows resuming from a later fold (e.g., export START_FOLD=3)
+AUTO_RESUME = True
+START_FOLD = int(os.environ.get("START_FOLD", "0"))
+
 
 # ----------------------------
 # Reproducibility utilities
@@ -61,6 +69,103 @@ def seed_everything(seed: int = 42) -> None:
     # Determinism is helpful for CV comparisons, but may reduce speed on GPU.
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
+
+
+# ----------------------------
+# Checkpoint helpers (resumable)
+# ----------------------------
+def find_latest_checkpoint(checkpoint_dir: Path, fold_idx: int) -> Optional[Path]:
+    """
+    Return the checkpoint with the highest epoch number for this fold.
+    """
+    candidates = []
+    for p in checkpoint_dir.glob(f"checkpoint_fold_{fold_idx}_epoch_*.pt"):
+        try:
+            epoch_str = p.name.split("_epoch_")[-1].replace(".pt", "")
+            epoch = int(epoch_str)
+            candidates.append((epoch, p))
+        except Exception:
+            continue
+    if not candidates:
+        return None
+    candidates.sort(key=lambda x: x[0])
+    return candidates[-1][1]
+
+
+def save_checkpoint(
+    *,
+    checkpoint_dir: Path,
+    fold_idx: int,
+    epoch: int,
+    model: nn.Module,
+    optimizer: torch.optim.Optimizer,
+    scheduler: torch.optim.lr_scheduler._LRScheduler,
+    scaler: Optional[torch.cuda.amp.GradScaler],
+    best_val_loss: float,
+    is_best: bool,
+    cfg: Config,
+) -> None:
+    ckpt = {
+        "fold": fold_idx,
+        "epoch": epoch,
+        "model_state_dict": model.state_dict(),
+        "optimizer_state_dict": optimizer.state_dict(),
+        "scheduler_state_dict": scheduler.state_dict(),
+        "best_val_loss": float(best_val_loss),
+        "cfg": cfg.__dict__,
+        "rng_state": {
+            "python": random.getstate(),
+            "numpy": np.random.get_state(),
+            "torch": torch.get_rng_state(),
+            "torch_cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
+        },
+    }
+    if scaler is not None:
+        ckpt["scaler_state_dict"] = scaler.state_dict()
+
+    ckpt_path = checkpoint_dir / f"checkpoint_fold_{fold_idx}_epoch_{epoch}.pt"
+    torch.save(ckpt, ckpt_path)
+
+    if is_best:
+        best_path = checkpoint_dir / f"best_model_v2.6_fold_{fold_idx}.pt"
+        torch.save(ckpt, best_path)
+        print(f"✅ Best model saved: {best_path.name} (best_val_loss={best_val_loss:.4f})")
+
+
+def try_resume(
+    *,
+    checkpoint_path: Path,
+    device: torch.device,
+    model: nn.Module,
+    optimizer: torch.optim.Optimizer,
+    scheduler: torch.optim.lr_scheduler._LRScheduler,
+    scaler: Optional[torch.cuda.amp.GradScaler],
+) -> Tuple[int, float]:
+    """
+    Restore model/optim/scheduler/scaler and return (start_epoch, best_val_loss).
+    """
+    ckpt = torch.load(checkpoint_path, map_location=device)
+    model.load_state_dict(ckpt["model_state_dict"])
+    optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+    scheduler.load_state_dict(ckpt["scheduler_state_dict"])
+    if scaler is not None and "scaler_state_dict" in ckpt:
+        scaler.load_state_dict(ckpt["scaler_state_dict"])
+
+    # Restore RNG state (best effort)
+    rng = ckpt.get("rng_state")
+    if rng is not None:
+        try:
+            random.setstate(rng.get("python"))
+            np.random.set_state(rng.get("numpy"))
+            torch.set_rng_state(rng.get("torch"))
+            if torch.cuda.is_available() and rng.get("torch_cuda") is not None:
+                torch.cuda.set_rng_state_all(rng.get("torch_cuda"))
+        except Exception:
+            pass
+
+    start_epoch = int(ckpt["epoch"]) + 1
+    best_val_loss = float(ckpt.get("best_val_loss", float("inf")))
+    return start_epoch, best_val_loss
 
 
 # ----------------------------
@@ -591,7 +696,10 @@ def main():
     fold_summaries = []
     folds = get_folds_from_splits(splits)
 
-    for fold_idx in range(cfg.num_folds):
+    start_fold = START_FOLD
+    print(f"✅ Start fold: {start_fold} (set START_FOLD env var to override)")
+
+    for fold_idx in range(start_fold, cfg.num_folds):
         print("\n" + "=" * 80)
         print(f"Fold {fold_idx}/{cfg.num_folds - 1}")
         print("=" * 80)
@@ -662,11 +770,30 @@ def main():
             w = class_balanced_weights(t2_counts, beta=cfg.cb_beta) if cfg.use_class_balanced else None
             loss_task2 = nn.CrossEntropyLoss(weight=(w.to(device) if w is not None else None), label_smoothing=cfg.label_smoothing)
 
+        # Resumable state
         best_val = float("inf")
         best_path = checkpoint_dir / f"best_model_v2.6_fold_{fold_idx}.pt"
         history = []
 
-        for epoch in range(cfg.num_epochs):
+        # Auto-resume (if checkpoint exists)
+        start_epoch = 0
+        latest_ckpt = find_latest_checkpoint(checkpoint_dir, fold_idx)
+        if latest_ckpt is not None:
+            print(f"⚠️  Found checkpoint: {latest_ckpt.name}")
+            if AUTO_RESUME:
+                start_epoch, best_val = try_resume(
+                    checkpoint_path=latest_ckpt,
+                    device=device,
+                    model=model,
+                    optimizer=optimizer,
+                    scheduler=scheduler,
+                    scaler=scaler,
+                )
+                print(f"✅ Resumed fold {fold_idx} from epoch {start_epoch} (best_val_loss={best_val:.4f})")
+            else:
+                print("AUTO_RESUME=False → starting from scratch.")
+
+        for epoch in range(start_epoch, cfg.num_epochs):
             model.train()
             train_loss = 0.0
             n_train = 0
@@ -753,19 +880,23 @@ def main():
                 f"T1 acc {t1_acc:.3f} | T2 acc {t2_acc:.3f}"
             )
 
-            if val_loss < best_val:
+            is_best = val_loss < best_val
+            if is_best:
                 best_val = val_loss
-                torch.save(
-                    {
-                        "model_state_dict": model.state_dict(),
-                        "cfg": cfg.__dict__,
-                        "fold": fold_idx,
-                        "epoch": epoch + 1,
-                        "val_loss": best_val,
-                        "t2_counts": t2_counts,
-                    },
-                    best_path,
-                )
+
+            # Save resumable checkpoint every epoch + best model snapshot
+            save_checkpoint(
+                checkpoint_dir=checkpoint_dir,
+                fold_idx=fold_idx,
+                epoch=epoch,
+                model=model,
+                optimizer=optimizer,
+                scheduler=scheduler,
+                scaler=scaler if (device.type == "cuda") else None,
+                best_val_loss=best_val,
+                is_best=is_best,
+                cfg=cfg,
+            )
 
         # Save fold history
         hist_df = pd.DataFrame(history)
@@ -775,6 +906,21 @@ def main():
         print(f"✅ Best model: {best_path.name} (val_loss={best_val:.4f})")
 
         fold_summaries.append({"fold": fold_idx, "best_val_loss": best_val, "best_model": best_path.name})
+
+        # Cleanup old checkpoints (keep last 3 epochs for this fold)
+        ckpts = []
+        for p in checkpoint_dir.glob(f"checkpoint_fold_{fold_idx}_epoch_*.pt"):
+            try:
+                ep = int(p.name.split("_epoch_")[-1].replace(".pt", ""))
+                ckpts.append((ep, p))
+            except Exception:
+                continue
+        ckpts.sort(key=lambda x: x[0])
+        for _ep, old in ckpts[:-3]:
+            try:
+                old.unlink()
+            except Exception:
+                pass
 
     # Save summary
     summary_df = pd.DataFrame(fold_summaries)
