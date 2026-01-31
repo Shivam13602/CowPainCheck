@@ -8,7 +8,9 @@ This directory is organized by **model version**, so each version has its own tr
 - `v2.3/`: legacy baseline (multi-task + evaluation utilities)
 - `v2.4/`: **regression-only** (primary regression baseline for the paper)
 - `v2.5/`: **classification-only** (dual classification heads)
+- `v2.6/`: **classification (improved v2.5)** with 4-class moment head + imbalance/robustness upgrades
 - `analysis/`: shared statistical analysis and weight assignment notes
+ - `dataset_metadata/`: lightweight metadata (splits/mapping) used by scripts
 
 ## What results should be pushed to GitHub (recommended)
 
