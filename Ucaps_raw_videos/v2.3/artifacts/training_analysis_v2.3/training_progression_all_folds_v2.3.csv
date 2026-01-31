@@ -1,0 +1,4 @@
+Fold,Epoch,Val_Loss,Val_Acc,Val_F1,Is_Best
+8,8,5.707630157470703,,,False
+8,9,5.610086441040039,,,False
+8,23,6.2389960289001465,,,False

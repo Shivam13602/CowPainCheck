@@ -1,0 +1,10 @@
+Fold,Best Epoch,Best Val Loss,Best Val Acc,Best Val F1,Final Val Acc,Final Val F1,Total Epochs,Status
+0,3,3.8449,N/A,N/A,N/A,N/A,0,❌ Not trained
+1,31,5.4500,N/A,N/A,N/A,N/A,0,❌ Not trained
+2,4,7.7009,N/A,N/A,N/A,N/A,0,❌ Not trained
+3,52,4.3027,N/A,N/A,N/A,N/A,0,❌ Not trained
+4,14,7.5809,N/A,N/A,N/A,N/A,0,❌ Not trained
+5,6,13.7457,N/A,N/A,N/A,N/A,0,❌ Not trained
+6,20,13.2425,N/A,N/A,N/A,N/A,0,❌ Not trained
+7,59,3.5164,N/A,N/A,N/A,N/A,0,❌ Not trained
+8,3,5.3064,N/A,N/A,N/A,N/A,3,✅ Trained

@@ -16,6 +16,12 @@ __pycache__/
 sequence/
 sequences/
 
+# Allow selected lightweight artifacts/metadata to be committed
+!**/artifacts/**/*.csv
+!**/artifacts/**/*.json
+!dataset_metadata/**/*.csv
+!dataset_metadata/**/*.json
+
 # Jupyter
 .ipynb_checkpoints
 

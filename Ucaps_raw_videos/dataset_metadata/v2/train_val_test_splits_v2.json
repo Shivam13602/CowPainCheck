@@ -1,0 +1,693 @@
+{
+  "dataset_version": "v2.0",
+  "num_animals": 20,
+  "test_animals": [
+    14,
+    17
+  ],
+  "train_val_animals": [
+    6,
+    19,
+    2,
+    20,
+    24,
+    22,
+    3,
+    7,
+    11,
+    4,
+    8,
+    15,
+    21,
+    18,
+    12,
+    9,
+    16,
+    1
+  ],
+  "num_folds": 9,
+  "validation_coverage": 18,
+  "cv_folds": [
+    {
+      "fold": 0,
+      "train_animals": [
+        6,
+        19,
+        2,
+        20,
+        24,
+        3,
+        7,
+        11,
+        4,
+        8,
+        15,
+        21,
+        18,
+        12,
+        16,
+        1
+      ],
+      "val_animals": [
+        22,
+        9
+      ]
+    },
+    {
+      "fold": 1,
+      "train_animals": [
+        6,
+        19,
+        2,
+        20,
+        24,
+        22,
+        7,
+        11,
+        4,
+        8,
+        15,
+        21,
+        18,
+        12,
+        9,
+        16
+      ],
+      "val_animals": [
+        3,
+        1
+      ]
+    },
+    {
+      "fold": 2,
+      "train_animals": [
+        6,
+        19,
+        2,
+        20,
+        24,
+        22,
+        3,
+        7,
+        4,
+        8,
+        15,
+        21,
+        18,
+        12,
+        9,
+        1
+      ],
+      "val_animals": [
+        11,
+        16
+      ]
+    },
+    {
+      "fold": 3,
+      "train_animals": [
+        6,
+        2,
+        20,
+        24,
+        22,
+        3,
+        7,
+        11,
+        4,
+        8,
+        15,
+        21,
+        18,
+        9,
+        16,
+        1
+      ],
+      "val_animals": [
+        19,
+        12
+      ]
+    },
+    {
+      "fold": 4,
+      "train_animals": [
+        19,
+        2,
+        20,
+        24,
+        22,
+        3,
+        7,
+        11,
+        4,
+        8,
+        15,
+        21,
+        12,
+        9,
+        16,
+        1
+      ],
+      "val_animals": [
+        6,
+        18
+      ]
+    },
+    {
+      "fold": 5,
+      "train_animals": [
+        6,
+        19,
+        20,
+        24,
+        22,
+        3,
+        7,
+        11,
+        4,
+        8,
+        15,
+        18,
+        12,
+        9,
+        16,
+        1
+      ],
+      "val_animals": [
+        2,
+        21
+      ]
+    },
+    {
+      "fold": 6,
+      "train_animals": [
+        6,
+        19,
+        2,
+        24,
+        22,
+        3,
+        11,
+        4,
+        8,
+        15,
+        21,
+        18,
+        12,
+        9,
+        16,
+        1
+      ],
+      "val_animals": [
+        20,
+        7
+      ]
+    },
+    {
+      "fold": 7,
+      "train_animals": [
+        6,
+        19,
+        2,
+        20,
+        22,
+        3,
+        7,
+        11,
+        8,
+        15,
+        21,
+        18,
+        12,
+        9,
+        16,
+        1
+      ],
+      "val_animals": [
+        24,
+        4
+      ]
+    },
+    {
+      "fold": 8,
+      "train_animals": [
+        6,
+        19,
+        2,
+        20,
+        24,
+        22,
+        3,
+        7,
+        11,
+        4,
+        21,
+        18,
+        12,
+        9,
+        16,
+        1
+      ],
+      "val_animals": [
+        8,
+        15
+      ]
+    }
+  ],
+  "split_statistics": {
+    "train_val_animals": [
+      6,
+      19,
+      2,
+      20,
+      24,
+      22,
+      3,
+      7,
+      11,
+      4,
+      8,
+      15,
+      21,
+      18,
+      12,
+      9,
+      16,
+      1
+    ],
+    "test_animals": [
+      14,
+      17
+    ],
+    "num_folds": 9,
+    "validation_coverage": 18,
+    "sequences_per_animal": {
+      "6": 19,
+      "19": 16,
+      "2": 17,
+      "20": 25,
+      "24": 27,
+      "22": 20,
+      "3": 19,
+      "7": 23,
+      "11": 15,
+      "4": 19,
+      "8": 25,
+      "15": 20,
+      "21": 20,
+      "18": 17,
+      "12": 19,
+      "9": 22,
+      "16": 11,
+      "1": 17,
+      "14": 19,
+      "17": 16
+    },
+    "moments_per_animal": {
+      "6": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "19": [
+        "M0",
+        "M1",
+        "M2",
+        "M4"
+      ],
+      "2": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "20": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "24": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "22": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "3": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "7": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "11": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "4": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "8": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "15": [
+        "M0",
+        "M1",
+        "M3",
+        "M4"
+      ],
+      "21": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "18": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "12": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "9": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "16": [
+        "M0",
+        "M1",
+        "M4"
+      ],
+      "1": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "14": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ],
+      "17": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4"
+      ]
+    },
+    "labels_per_animal": {
+      "6": {
+        "Orbital_tightening": 1.2666666666666666,
+        "Tension_above_eyes": 0.8666666666666666,
+        "Cheek_tightening": 0.4,
+        "Ears_frontal": 0.7333333333333333,
+        "Ears_lateral": 0.9333333333333333,
+        "Lip_jaw_profile": 0.6666666666666666,
+        "Nostril_muzzle": 0.26666666666666666,
+        "NRS (1-10)": 4.466666666666667,
+        "VAS (0-100)": 41.93333333333333,
+        "Total.Facial.scale": 5.133333333333334
+      },
+      "19": {
+        "Orbital_tightening": 0.4666666666666666,
+        "Tension_above_eyes": 1.1666666666666667,
+        "Cheek_tightening": 0.7083333333333334,
+        "Ears_frontal": 0.2,
+        "Ears_lateral": 0.8666666666666666,
+        "Lip_jaw_profile": 1.0,
+        "Nostril_muzzle": 1.1333333333333333,
+        "NRS (1-10)": 3.8,
+        "VAS (0-100)": 29.46666666666666,
+        "Total.Facial.scale": 4.7333333333333325
+      },
+      "2": {
+        "Orbital_tightening": 0.9333333333333333,
+        "Tension_above_eyes": 1.2,
+        "Cheek_tightening": 0.4666666666666666,
+        "Ears_frontal": 0.2,
+        "Ears_lateral": 0.8,
+        "Lip_jaw_profile": 0.7333333333333334,
+        "Nostril_muzzle": 0.6,
+        "NRS (1-10)": 3.6,
+        "VAS (0-100)": 29.333333333333332,
+        "Total.Facial.scale": 4.933333333333333
+      },
+      "20": {
+        "Orbital_tightening": 1.0666666666666667,
+        "Tension_above_eyes": 0.8666666666666666,
+        "Cheek_tightening": 0.3333333333333333,
+        "Ears_frontal": 0.8,
+        "Ears_lateral": 1.1999999999999997,
+        "Lip_jaw_profile": 0.5333333333333333,
+        "Nostril_muzzle": 0.5333333333333333,
+        "NRS (1-10)": 3.5333333333333337,
+        "VAS (0-100)": 30.2,
+        "Total.Facial.scale": 5.333333333333334
+      },
+      "24": {
+        "Orbital_tightening": 0.4666666666666666,
+        "Tension_above_eyes": 0.5333333333333333,
+        "Cheek_tightening": 0.26666666666666666,
+        "Ears_frontal": 0.26666666666666666,
+        "Ears_lateral": 0.5999999999999999,
+        "Lip_jaw_profile": 0.2,
+        "Nostril_muzzle": 0.39999999999999997,
+        "NRS (1-10)": 2.6666666666666665,
+        "VAS (0-100)": 17.666666666666668,
+        "Total.Facial.scale": 2.7333333333333334
+      },
+      "22": {
+        "Orbital_tightening": 0.4666666666666666,
+        "Tension_above_eyes": 0.7333333333333333,
+        "Cheek_tightening": 0.2333333333333333,
+        "Ears_frontal": 0.4,
+        "Ears_lateral": 0.7999999999999999,
+        "Lip_jaw_profile": 0.5333333333333333,
+        "Nostril_muzzle": 0.5999999999999999,
+        "NRS (1-10)": 3.5333333333333337,
+        "VAS (0-100)": 24.333333333333332,
+        "Total.Facial.scale": 3.7333333333333334
+      },
+      "3": {
+        "Orbital_tightening": 0.2,
+        "Tension_above_eyes": 1.0,
+        "Cheek_tightening": 0.3333333333333333,
+        "Ears_frontal": 0.5333333333333333,
+        "Ears_lateral": 0.5333333333333333,
+        "Lip_jaw_profile": 0.4,
+        "Nostril_muzzle": 0.6666666666666666,
+        "NRS (1-10)": 3.4666666666666663,
+        "VAS (0-100)": 23.6,
+        "Total.Facial.scale": 3.6666666666666665
+      },
+      "7": {
+        "Orbital_tightening": 0.3333333333333333,
+        "Tension_above_eyes": 0.9333333333333332,
+        "Cheek_tightening": 0.26666666666666666,
+        "Ears_frontal": 0.26666666666666666,
+        "Ears_lateral": 0.6,
+        "Lip_jaw_profile": 0.5333333333333334,
+        "Nostril_muzzle": 0.26666666666666666,
+        "NRS (1-10)": 2.933333333333333,
+        "VAS (0-100)": 19.4,
+        "Total.Facial.scale": 3.2
+      },
+      "11": {
+        "Orbital_tightening": 0.7333333333333333,
+        "Tension_above_eyes": 0.8666666666666666,
+        "Cheek_tightening": 0.4666666666666666,
+        "Ears_frontal": 0.7333333333333333,
+        "Ears_lateral": 0.8,
+        "Lip_jaw_profile": 0.5333333333333333,
+        "Nostril_muzzle": 0.4666666666666666,
+        "NRS (1-10)": 3.4666666666666663,
+        "VAS (0-100)": 26.46666666666667,
+        "Total.Facial.scale": 4.6
+      },
+      "4": {
+        "Orbital_tightening": 0.8,
+        "Tension_above_eyes": 0.7999999999999999,
+        "Cheek_tightening": 0.26666666666666666,
+        "Ears_frontal": 0.3333333333333333,
+        "Ears_lateral": 0.4,
+        "Lip_jaw_profile": 0.5333333333333333,
+        "Nostril_muzzle": 0.6666666666666667,
+        "NRS (1-10)": 3.0000000000000004,
+        "VAS (0-100)": 21.466666666666665,
+        "Total.Facial.scale": 3.8
+      },
+      "8": {
+        "Orbital_tightening": 0.13333333333333333,
+        "Tension_above_eyes": 1.0,
+        "Cheek_tightening": 0.2,
+        "Ears_frontal": 0.6,
+        "Ears_lateral": 0.7333333333333333,
+        "Lip_jaw_profile": 0.5333333333333334,
+        "Nostril_muzzle": 0.6666666666666667,
+        "NRS (1-10)": 2.8666666666666663,
+        "VAS (0-100)": 18.866666666666667,
+        "Total.Facial.scale": 3.8666666666666663
+      },
+      "15": {
+        "Orbital_tightening": 0.5999999999999999,
+        "Tension_above_eyes": 0.39999999999999997,
+        "Cheek_tightening": 0.2,
+        "Ears_frontal": 0.13333333333333333,
+        "Ears_lateral": 0.2,
+        "Lip_jaw_profile": 0.4666666666666667,
+        "Nostril_muzzle": 0.4666666666666666,
+        "NRS (1-10)": 3.3333333333333335,
+        "VAS (0-100)": 22.466666666666665,
+        "Total.Facial.scale": 2.466666666666667
+      },
+      "21": {
+        "Orbital_tightening": 0.6,
+        "Tension_above_eyes": 0.7333333333333332,
+        "Cheek_tightening": 0.26666666666666666,
+        "Ears_frontal": 0.39999999999999997,
+        "Ears_lateral": 0.7333333333333334,
+        "Lip_jaw_profile": 0.39999999999999997,
+        "Nostril_muzzle": 0.4666666666666666,
+        "NRS (1-10)": 2.7333333333333334,
+        "VAS (0-100)": 17.0,
+        "Total.Facial.scale": 3.6
+      },
+      "18": {
+        "Orbital_tightening": 0.39999999999999997,
+        "Tension_above_eyes": 0.4666666666666667,
+        "Cheek_tightening": 0.13333333333333333,
+        "Ears_frontal": 0.3333333333333333,
+        "Ears_lateral": 0.7333333333333333,
+        "Lip_jaw_profile": 0.5666666666666667,
+        "Nostril_muzzle": 0.39999999999999997,
+        "NRS (1-10)": 2.466666666666667,
+        "VAS (0-100)": 14.466666666666669,
+        "Total.Facial.scale": 3.0
+      },
+      "12": {
+        "Orbital_tightening": 0.3333333333333333,
+        "Tension_above_eyes": 0.6,
+        "Cheek_tightening": 0.06666666666666667,
+        "Ears_frontal": 0.2,
+        "Ears_lateral": 0.5333333333333333,
+        "Lip_jaw_profile": 0.26666666666666666,
+        "Nostril_muzzle": 0.2,
+        "NRS (1-10)": 2.7333333333333334,
+        "VAS (0-100)": 14.733333333333334,
+        "Total.Facial.scale": 2.2
+      },
+      "9": {
+        "Orbital_tightening": 0.39999999999999997,
+        "Tension_above_eyes": 0.4,
+        "Cheek_tightening": 0.13333333333333333,
+        "Ears_frontal": 0.3333333333333333,
+        "Ears_lateral": 0.5999999999999999,
+        "Lip_jaw_profile": 0.2,
+        "Nostril_muzzle": 0.26666666666666666,
+        "NRS (1-10)": 2.666666666666667,
+        "VAS (0-100)": 13.066666666666668,
+        "Total.Facial.scale": 2.333333333333333
+      },
+      "16": {
+        "Orbital_tightening": 0.2222222222222222,
+        "Tension_above_eyes": 0.4444444444444444,
+        "Cheek_tightening": 0.0,
+        "Ears_frontal": 0.0,
+        "Ears_lateral": 0.2222222222222222,
+        "Lip_jaw_profile": 0.27777777777777773,
+        "Nostril_muzzle": 0.0,
+        "NRS (1-10)": 1.9333333333333336,
+        "VAS (0-100)": 8.8,
+        "Total.Facial.scale": 1.111111111111111
+      },
+      "1": {
+        "Orbital_tightening": 0.13333333333333333,
+        "Tension_above_eyes": 0.7999999999999999,
+        "Cheek_tightening": 0.0,
+        "Ears_frontal": 0.39999999999999997,
+        "Ears_lateral": 0.3333333333333333,
+        "Lip_jaw_profile": 0.13333333333333333,
+        "Nostril_muzzle": 0.2,
+        "NRS (1-10)": 2.066666666666667,
+        "VAS (0-100)": 11.266666666666666,
+        "Total.Facial.scale": 1.9
+      },
+      "14": {
+        "Orbital_tightening": 0.6666666666666666,
+        "Tension_above_eyes": 0.8666666666666666,
+        "Cheek_tightening": 0.5333333333333333,
+        "Ears_frontal": 0.5333333333333333,
+        "Ears_lateral": 0.7333333333333333,
+        "Lip_jaw_profile": 0.7333333333333333,
+        "Nostril_muzzle": 0.6,
+        "NRS (1-10)": 5.2666666666666675,
+        "VAS (0-100)": 43.46666666666666,
+        "Total.Facial.scale": 4.666666666666666
+      },
+      "17": {
+        "Orbital_tightening": 0.3333333333333333,
+        "Tension_above_eyes": 0.4666666666666666,
+        "Cheek_tightening": 0.13333333333333333,
+        "Ears_frontal": 0.2,
+        "Ears_lateral": 0.2,
+        "Lip_jaw_profile": 0.06666666666666667,
+        "Nostril_muzzle": 0.2,
+        "NRS (1-10)": 1.6,
+        "VAS (0-100)": 8.266666666666667,
+        "Total.Facial.scale": 1.6
+      }
+    }
+  },
+  "test_selection_criteria": {
+    "high_variance_animal": 14,
+    "low_variance_animal": 17,
+    "high_variance_nrs_var": 15.57777777777778,
+    "low_variance_nrs_var": 0.4666666666666666
+  }
+}

@@ -2,6 +2,13 @@
 
 This folder contains the complete training and evaluation code for the automated cattle pain detection model (v2.2/v2.3) using deep learning on facial video sequences. The model includes both regression (facial features) and classification (pain intensity) tasks.
 
+## Exported artifacts (from `facial_pain_project_v2` folder)
+
+This repo also includes the exported CSV outputs produced by evaluation/training-analysis scripts:
+
+- Test-set evaluation CSVs: `artifacts/evaluation_results_v2.3/`
+- Training-analysis CSVs: `artifacts/training_analysis_v2.3/`
+
 ## 📁 Files
 
 - `train_temporal_pain_model_v2.py` - Complete training script for Google Colab

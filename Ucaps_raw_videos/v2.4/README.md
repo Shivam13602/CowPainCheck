@@ -11,3 +11,10 @@
 
 Use the **numbers reported in** `V2.4_TRAINING_SUMMARY.md` (test ensemble + moment-wise breakdown).
 
+## Exported artifacts (from `facial_pain_project_v2` folder)
+
+These are the raw outputs produced by the evaluation/visualization scripts:
+
+- **Test-set evaluation CSVs**: `artifacts/evaluation_results_v2.4/`
+- **Grad-CAM visualizations**: `artifacts/gradcam_visualizations_v2.4/`
+
