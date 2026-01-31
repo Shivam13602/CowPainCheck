@@ -24,6 +24,7 @@ import os
 import json
 import math
 import random
+import re
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
@@ -60,6 +61,44 @@ def seed_everything(seed: int = 42) -> None:
     # Determinism is helpful for CV comparisons, but may reduce speed on GPU.
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
+
+
+# ----------------------------
+# Split schema helpers
+# ----------------------------
+def get_folds_from_splits(splits_dict: dict) -> List[dict]:
+    """
+    UCAPS split files have appeared with multiple schemas:
+    - splits["cv_folds"] (your current file): list[{"train_animals":[...],"val_animals":[...]}]
+    - splits["folds"]: list[...]
+    - splits["cv_folds"] as dict with fold keys
+    This helper makes v2.6 robust to these variants.
+    """
+    cv = splits_dict.get("cv_folds")
+    if isinstance(cv, list) and len(cv) > 0:
+        return cv
+
+    folds = splits_dict.get("folds")
+    if isinstance(folds, list) and len(folds) > 0:
+        return folds
+
+    # dict schema
+    if isinstance(cv, dict):
+        items = []
+        for k, v in cv.items():
+            if not isinstance(v, dict):
+                continue
+            if "train_animals" in v and "val_animals" in v:
+                m = re.match(r"^fold[_\-]?(\d+)$", str(k).strip().lower())
+                if m:
+                    items.append((int(m.group(1)), v))
+                elif str(k).isdigit():
+                    items.append((int(k), v))
+        if items:
+            items.sort(key=lambda x: x[0])
+            return [v for _, v in items]
+
+    raise KeyError("Could not find folds in splits JSON (expected cv_folds or folds).")
 
 
 # ----------------------------
@@ -539,6 +578,8 @@ def main():
     # device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"✅ Device: {device}")
+    if device.type != "cuda":
+        print("⚠️  CUDA not available. In Colab: Runtime → Change runtime type → GPU (L4).")
 
     # Persist config for reproducibility
     cfg_path = results_dir / "config_v2.6.json"
@@ -548,13 +589,14 @@ def main():
 
     # Train folds
     fold_summaries = []
+    folds = get_folds_from_splits(splits)
 
     for fold_idx in range(cfg.num_folds):
         print("\n" + "=" * 80)
         print(f"Fold {fold_idx}/{cfg.num_folds - 1}")
         print("=" * 80)
 
-        fold = splits["folds"][fold_idx]
+        fold = folds[fold_idx]
         train_animals = fold["train_animals"]
         val_animals = fold["val_animals"]
 
